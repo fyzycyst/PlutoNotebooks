@@ -20,6 +20,16 @@ md"""
 First set are examples from [Getting Started with Differential Equations in Julia] (https://docs.sciml.ai/DiffEqDocs/stable/getting_started/).
 """
 
+# ╔═╡ 9b440c4a-2c20-4f57-98d4-400d8a55d2db
+md"""
+Suggestion: Instead of running ALL cells, run the two 'using' cells below, then run the cells associated with the Example you want.
+"""
+
+# ╔═╡ 746b44c2-0ac7-4fd6-b7d8-b1e966d740eb
+md"""
+### Example 1: Solving Scalar Equations
+"""
+
 # ╔═╡ eee95051-5b61-442d-a646-7b92a3a2fb53
 md"""
 Solve the equation...
@@ -43,15 +53,6 @@ md"""
 # ╔═╡ 598e929f-9345-4095-8d00-9540307feb3f
 f(u, p, t) = 1.01 * u
 
-# ╔═╡ b5c87335-55e4-4f5b-adb8-1fe06cc6c315
-u0 = 1/2
-
-# ╔═╡ df758ca7-ad6c-4f09-948b-504aeb86ccdb
-tspan = (0.0, 1.0)
-
-# ╔═╡ bd0135c8-cc6d-4133-bfe2-939dc88f76a9
-prob = ODEProblem(f, u0, tspan)
-
 # ╔═╡ 14d8a40f-3675-431f-9839-ed6b660aeb29
 md"""
 ##### Step 2: Solve the problem
@@ -61,9 +62,6 @@ md"""
 md"""
 We can either allow defaults or manually select things like solver algorithm, tolerances, etc.
 """
-
-# ╔═╡ 07aba977-c232-445d-91ba-96044271ba51
-sol = solve(prob, Tsit5(), reltol = 1e-8, abstol = 1e-8)
 
 # ╔═╡ 0a5bed38-51bf-4a95-8bf4-6497e978149d
 md"""
@@ -75,6 +73,55 @@ md"""
 ##### Step 3: Analyse the solution
 """
 
+# ╔═╡ 006ccf33-bfdb-496e-a786-a8f476bd472a
+md"""
+### Example 2: Solving Systems of Equations
+"""
+
+# ╔═╡ b9669aa5-8879-4150-927d-881652358058
+md"""
+Here we handle the Lorenz equations:
+"""
+
+# ╔═╡ 3ec6b2f4-331e-4ecd-8a83-e6f375c418a8
+md"""
+``
+\frac{dx}{dt} = \sigma (y - x)
+``
+
+``
+\frac{dy}{dt} = x(\rho - z) - y
+``
+
+``
+\frac{dz}{dt} = xy - \beta z
+``
+"""
+
+# ╔═╡ e96426f2-a3ad-4211-a6cc-12212c4c9fdf
+md"""
+The system of equations is embedded in a function. Speed-wise, we want this function to be a 'bang' (!) function that modifies one of its arguments. In this case, we treat the system of equations as a vector $du$.
+"""
+
+# ╔═╡ 325427ac-fe4f-413e-97c2-80fc3cf3b252
+function lorenz!(du, u, p, t)
+	du[1] = 10.0 * (u[2] - u[1])
+	du[2] = u[1] * (28.0 - u[3]) - u[2]
+	du[3] = u[1] * u[2] - (8 / 3) * u[3]
+end
+
+# ╔═╡ 19c60c21-f6b6-4c4a-a6df-8043cfd40b9d
+md"""
+In this function, $\sigma$, $\rho$, and $\beta$ are hard-coded.
+"""
+
+# ╔═╡ bbf82602-0d42-4b5d-9349-ce37123a3051
+md"""
+We follow the same general pattern for solving the problem...
+
+(Pluto helpfully disables prior definitions of the same variable.)
+"""
+
 # ╔═╡ f7c0b4fa-e379-456f-a9ae-d5d77e93a21f
 plot(sol, linewidth = 5, title = "Solution to the linear ODE",
     xaxis = "Time (t)", yaxis = "u(t) (in μm)", label = "DifferentialEquations.jl")
@@ -82,8 +129,47 @@ plot(sol, linewidth = 5, title = "Solution to the linear ODE",
 # ╔═╡ 2904c4fd-0525-4207-af23-9c70c43f8b81
 plot!(sol.t, t -> 0.5 * exp(1.01t), lw = 3, ls = :dash, label = "Exact Solution")
 
-# ╔═╡ 006ccf33-bfdb-496e-a786-a8f476bd472a
+# ╔═╡ 5882f4a0-7cdf-4a2a-acdf-ec9d962fc487
+plot(sol, idxs = (1, 2, 3))
 
+# ╔═╡ 9ca57bb3-b163-40db-97af-c8d088081322
+
+
+# ╔═╡ b5c87335-55e4-4f5b-adb8-1fe06cc6c315
+# ╠═╡ disabled = true
+#=╠═╡
+u0 = 1/2
+  ╠═╡ =#
+
+# ╔═╡ df758ca7-ad6c-4f09-948b-504aeb86ccdb
+# ╠═╡ disabled = true
+#=╠═╡
+tspan = (0.0, 1.0)
+  ╠═╡ =#
+
+# ╔═╡ 702829d5-08aa-4001-ad87-5b15cd2a22df
+u0 = [1.0; 0.0; 0.0]
+
+# ╔═╡ 5b299b34-8142-4cda-bb5f-80b06c4acd8e
+tspan = (0.0, 100.0)
+
+# ╔═╡ b2156dcd-2ce9-485c-823c-4856d785e989
+prob = ODEProblem(lorenz!, u0, tspan)
+
+# ╔═╡ ddf742da-9776-40e0-866f-363ac293eefd
+sol = solve(prob)
+
+# ╔═╡ 07aba977-c232-445d-91ba-96044271ba51
+# ╠═╡ disabled = true
+#=╠═╡
+sol = solve(prob, Tsit5(), reltol = 1e-8, abstol = 1e-8)
+  ╠═╡ =#
+
+# ╔═╡ bd0135c8-cc6d-4133-bfe2-939dc88f76a9
+# ╠═╡ disabled = true
+#=╠═╡
+prob = ODEProblem(f, u0, tspan)
+  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -100,7 +186,7 @@ Plots = "~1.39.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.9.2"
+julia_version = "1.9.3"
 manifest_format = "2.0"
 project_hash = "a1bc4968dd2cfa924722270cdd9d3b155a82fc32"
 
@@ -2157,9 +2243,12 @@ version = "1.4.1+1"
 # ╔═╡ Cell order:
 # ╟─48f16f26-8239-11ee-0459-957ecf4a9832
 # ╟─a39a479e-a9b8-497c-ab2b-830eb462b417
-# ╟─eee95051-5b61-442d-a646-7b92a3a2fb53
-# ╟─30c40ffc-30b7-4dc1-87e6-2093f6284b84
+# ╟─9b440c4a-2c20-4f57-98d4-400d8a55d2db
 # ╠═735d024d-0da1-4961-883b-758615074881
+# ╠═6349a94a-6742-48bf-8943-64b84e1a3971
+# ╟─746b44c2-0ac7-4fd6-b7d8-b1e966d740eb
+# ╠═eee95051-5b61-442d-a646-7b92a3a2fb53
+# ╟─30c40ffc-30b7-4dc1-87e6-2093f6284b84
 # ╟─407a00fa-ab6f-4d3a-bdcc-39a0e1b443f5
 # ╠═598e929f-9345-4095-8d00-9540307feb3f
 # ╠═b5c87335-55e4-4f5b-adb8-1fe06cc6c315
@@ -2170,9 +2259,20 @@ version = "1.4.1+1"
 # ╠═07aba977-c232-445d-91ba-96044271ba51
 # ╟─0a5bed38-51bf-4a95-8bf4-6497e978149d
 # ╟─7b6f3333-8cda-49e4-9a2a-d7d060984325
-# ╠═6349a94a-6742-48bf-8943-64b84e1a3971
 # ╠═f7c0b4fa-e379-456f-a9ae-d5d77e93a21f
 # ╠═2904c4fd-0525-4207-af23-9c70c43f8b81
-# ╠═006ccf33-bfdb-496e-a786-a8f476bd472a
+# ╟─006ccf33-bfdb-496e-a786-a8f476bd472a
+# ╟─b9669aa5-8879-4150-927d-881652358058
+# ╟─3ec6b2f4-331e-4ecd-8a83-e6f375c418a8
+# ╟─e96426f2-a3ad-4211-a6cc-12212c4c9fdf
+# ╠═325427ac-fe4f-413e-97c2-80fc3cf3b252
+# ╟─19c60c21-f6b6-4c4a-a6df-8043cfd40b9d
+# ╟─bbf82602-0d42-4b5d-9349-ce37123a3051
+# ╠═702829d5-08aa-4001-ad87-5b15cd2a22df
+# ╠═5b299b34-8142-4cda-bb5f-80b06c4acd8e
+# ╠═b2156dcd-2ce9-485c-823c-4856d785e989
+# ╠═ddf742da-9776-40e0-866f-363ac293eefd
+# ╠═5882f4a0-7cdf-4a2a-acdf-ec9d962fc487
+# ╠═9ca57bb3-b163-40db-97af-c8d088081322
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
