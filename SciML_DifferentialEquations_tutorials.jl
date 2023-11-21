@@ -22,7 +22,7 @@ First set are examples from [Getting Started with Differential Equations in Juli
 
 # ╔═╡ 9b440c4a-2c20-4f57-98d4-400d8a55d2db
 md"""
-Suggestion: Instead of running ALL cells, run the two 'using' cells below, then run the cells associated with the Example you want.
+Suggestion: Instead of running ALL cells, ensure the cells you do not want to run are disabled, then run the Notebook.
 """
 
 # ╔═╡ 746b44c2-0ac7-4fd6-b7d8-b1e966d740eb
@@ -51,7 +51,28 @@ md"""
 """
 
 # ╔═╡ 598e929f-9345-4095-8d00-9540307feb3f
+# ╠═╡ disabled = true
+#=╠═╡
 f(u, p, t) = 1.01 * u
+  ╠═╡ =#
+
+# ╔═╡ b5c87335-55e4-4f5b-adb8-1fe06cc6c315
+# ╠═╡ disabled = true
+#=╠═╡
+u0 = 1/2
+  ╠═╡ =#
+
+# ╔═╡ df758ca7-ad6c-4f09-948b-504aeb86ccdb
+# ╠═╡ disabled = true
+#=╠═╡
+tspan = (0.0, 1.0)
+  ╠═╡ =#
+
+# ╔═╡ bd0135c8-cc6d-4133-bfe2-939dc88f76a9
+# ╠═╡ disabled = true
+#=╠═╡
+prob = ODEProblem(f, u0, tspan)
+  ╠═╡ =#
 
 # ╔═╡ 14d8a40f-3675-431f-9839-ed6b660aeb29
 md"""
@@ -63,6 +84,12 @@ md"""
 We can either allow defaults or manually select things like solver algorithm, tolerances, etc.
 """
 
+# ╔═╡ 07aba977-c232-445d-91ba-96044271ba51
+# ╠═╡ disabled = true
+#=╠═╡
+sol = solve(prob, Tsit5(), reltol = 1e-8, abstol = 1e-8)
+  ╠═╡ =#
+
 # ╔═╡ 0a5bed38-51bf-4a95-8bf4-6497e978149d
 md"""
 `sol` is a solution object. It contains vectors of the solution at specific times and a vector of those times. It can also be called as an interpolation function to find the solution at any time.
@@ -72,6 +99,19 @@ md"""
 md"""
 ##### Step 3: Analyse the solution
 """
+
+# ╔═╡ f7c0b4fa-e379-456f-a9ae-d5d77e93a21f
+# ╠═╡ disabled = true
+#=╠═╡
+plot(sol, linewidth = 5, title = "Solution to the linear ODE",
+    xaxis = "Time (t)", yaxis = "u(t) (in μm)", label = "DifferentialEquations.jl")
+  ╠═╡ =#
+
+# ╔═╡ 2904c4fd-0525-4207-af23-9c70c43f8b81
+# ╠═╡ disabled = true
+#=╠═╡
+plot!(sol.t, t -> 0.5 * exp(1.01t), lw = 3, ls = :dash, label = "Exact Solution")
+  ╠═╡ =#
 
 # ╔═╡ 006ccf33-bfdb-496e-a786-a8f476bd472a
 md"""
@@ -104,11 +144,14 @@ The system of equations is embedded in a function. Speed-wise, we want this func
 """
 
 # ╔═╡ 325427ac-fe4f-413e-97c2-80fc3cf3b252
+# ╠═╡ disabled = true
+#=╠═╡
 function lorenz!(du, u, p, t)
 	du[1] = 10.0 * (u[2] - u[1])
 	du[2] = u[1] * (28.0 - u[3]) - u[2]
 	du[3] = u[1] * u[2] - (8 / 3) * u[3]
 end
+  ╠═╡ =#
 
 # ╔═╡ 19c60c21-f6b6-4c4a-a6df-8043cfd40b9d
 md"""
@@ -122,53 +165,125 @@ We follow the same general pattern for solving the problem...
 (Pluto helpfully disables prior definitions of the same variable.)
 """
 
-# ╔═╡ f7c0b4fa-e379-456f-a9ae-d5d77e93a21f
-plot(sol, linewidth = 5, title = "Solution to the linear ODE",
-    xaxis = "Time (t)", yaxis = "u(t) (in μm)", label = "DifferentialEquations.jl")
-
-# ╔═╡ 2904c4fd-0525-4207-af23-9c70c43f8b81
-plot!(sol.t, t -> 0.5 * exp(1.01t), lw = 3, ls = :dash, label = "Exact Solution")
-
-# ╔═╡ 5882f4a0-7cdf-4a2a-acdf-ec9d962fc487
-plot(sol, idxs = (1, 2, 3))
-
 # ╔═╡ 9ca57bb3-b163-40db-97af-c8d088081322
+md"""
+#### Parameterized Functions
+"""
 
+# ╔═╡ d4f4cfdd-5d03-44c7-96d3-51d490063f01
+md"""
+Above, the parameters were hard coded... now we use the ```p``` argument to pass the parameters.
+"""
 
-# ╔═╡ b5c87335-55e4-4f5b-adb8-1fe06cc6c315
+# ╔═╡ 7de08fb5-1f60-4917-be75-7adaf3db3cb6
+md"""
+We set up the problem the same way, but also defining a vector for the parameters.
+"""
+
+# ╔═╡ 4b10b793-f312-4210-90ee-e86a656647cd
 # ╠═╡ disabled = true
 #=╠═╡
-u0 = 1/2
+p = [10.0, 28.0, 8 / 3]
   ╠═╡ =#
 
-# ╔═╡ df758ca7-ad6c-4f09-948b-504aeb86ccdb
+# ╔═╡ 20bc047d-7d5f-4107-b56a-cda29443652f
+md"""
+The function can be made more human readable...
+"""
+
+# ╔═╡ ddf742da-9776-40e0-866f-363ac293eefd
+# ╠═╡ disabled = true
+#=╠═╡
+sol = solve(prob)
+  ╠═╡ =#
+
+# ╔═╡ 5882f4a0-7cdf-4a2a-acdf-ec9d962fc487
+# ╠═╡ disabled = true
+#=╠═╡
+plot(sol, idxs = (1, 2, 3))
+  ╠═╡ =#
+
+# ╔═╡ 2da9c498-df17-4dc4-9c36-d6d4c836918f
+md"""
+### Example 3: Solving Nonhomogeneous Equations using Parameterized Functions
+"""
+
+# ╔═╡ b7e64b53-7f90-4dda-9351-dc3c632dfa70
+md"""
+In this example, we will work with a model of a pendulum... typical definitions of a slender rod of length $l$ and mass $m$:
+"""
+
+# ╔═╡ 229b00dc-9a22-43bc-8062-cf973c322bc3
+md"""
+``
+\frac{d \theta (t)}{dt} = \omega (t)
+``
+
+``
+\frac{d \omega (t)}{dt} = - \frac{3}{2} \frac{g}{l} sin \theta (t) + \frac{3}{m l^{2} M^{'}(t)}
+``
+
+where $\theta$ and $\omega$ are the angular deviation of the pendulum from the vertical and the angular rate, respectively. $M$ is the external torque and $g$ is gravitational acceleration.
+"""
+
+# ╔═╡ 667397b4-dd50-4e61-925c-a3d82c31c2e2
+
+
+# ╔═╡ 39534d5b-a9df-4aa9-a0cd-9d373144c134
+# ╠═╡ disabled = true
+#=╠═╡
+function parameterized_lorenz!(du, u, p, t)
+    x, y, z = u
+    σ, ρ, β = p
+    du[1] = dx = σ * (y - x)
+    du[2] = dy = x * (ρ - z) - y
+    du[3] = dz = x * y - β * z
+end
+  ╠═╡ =#
+
+# ╔═╡ 69b935c0-f371-4994-a6b8-7e454418ca1c
+# ╠═╡ disabled = true
+#=╠═╡
+u0 = [1.0, 0.0, 0.0]
+  ╠═╡ =#
+
+# ╔═╡ 1138a3c8-721e-48e9-a780-a8c374665d94
+# ╠═╡ disabled = true
+#=╠═╡
+function parameterized_lorenz!(du, u, p, t)
+    du[1] = p[1] * (u[2] - u[1])
+    du[2] = u[1] * (p[2] - u[3]) - u[2]
+    du[3] = u[1] * u[2] - p[3] * u[3]
+end
+  ╠═╡ =#
+
+# ╔═╡ b2156dcd-2ce9-485c-823c-4856d785e989
+# ╠═╡ disabled = true
+#=╠═╡
+prob = ODEProblem(lorenz!, u0, tspan)
+  ╠═╡ =#
+
+# ╔═╡ 5b299b34-8142-4cda-bb5f-80b06c4acd8e
+# ╠═╡ disabled = true
+#=╠═╡
+tspan = (0.0, 100.0)
+  ╠═╡ =#
+
+# ╔═╡ 702829d5-08aa-4001-ad87-5b15cd2a22df
+# ╠═╡ disabled = true
+#=╠═╡
+u0 = [1.0; 0.0; 0.0]
+  ╠═╡ =#
+
+# ╔═╡ 0aabf55e-c701-437b-a743-7fb97312e8f4
 # ╠═╡ disabled = true
 #=╠═╡
 tspan = (0.0, 1.0)
   ╠═╡ =#
 
-# ╔═╡ 702829d5-08aa-4001-ad87-5b15cd2a22df
-u0 = [1.0; 0.0; 0.0]
-
-# ╔═╡ 5b299b34-8142-4cda-bb5f-80b06c4acd8e
-tspan = (0.0, 100.0)
-
-# ╔═╡ b2156dcd-2ce9-485c-823c-4856d785e989
-prob = ODEProblem(lorenz!, u0, tspan)
-
-# ╔═╡ ddf742da-9776-40e0-866f-363ac293eefd
-sol = solve(prob)
-
-# ╔═╡ 07aba977-c232-445d-91ba-96044271ba51
-# ╠═╡ disabled = true
+# ╔═╡ cf85be5a-f5ef-4886-9985-5bea89b904d2
 #=╠═╡
-sol = solve(prob, Tsit5(), reltol = 1e-8, abstol = 1e-8)
-  ╠═╡ =#
-
-# ╔═╡ bd0135c8-cc6d-4133-bfe2-939dc88f76a9
-# ╠═╡ disabled = true
-#=╠═╡
-prob = ODEProblem(f, u0, tspan)
+prob = ODEProblem(parameterized_lorenz!, u0, tspan, p)
   ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -2247,7 +2362,7 @@ version = "1.4.1+1"
 # ╠═735d024d-0da1-4961-883b-758615074881
 # ╠═6349a94a-6742-48bf-8943-64b84e1a3971
 # ╟─746b44c2-0ac7-4fd6-b7d8-b1e966d740eb
-# ╠═eee95051-5b61-442d-a646-7b92a3a2fb53
+# ╟─eee95051-5b61-442d-a646-7b92a3a2fb53
 # ╟─30c40ffc-30b7-4dc1-87e6-2093f6284b84
 # ╟─407a00fa-ab6f-4d3a-bdcc-39a0e1b443f5
 # ╠═598e929f-9345-4095-8d00-9540307feb3f
@@ -2273,6 +2388,19 @@ version = "1.4.1+1"
 # ╠═b2156dcd-2ce9-485c-823c-4856d785e989
 # ╠═ddf742da-9776-40e0-866f-363ac293eefd
 # ╠═5882f4a0-7cdf-4a2a-acdf-ec9d962fc487
-# ╠═9ca57bb3-b163-40db-97af-c8d088081322
+# ╟─9ca57bb3-b163-40db-97af-c8d088081322
+# ╟─d4f4cfdd-5d03-44c7-96d3-51d490063f01
+# ╠═1138a3c8-721e-48e9-a780-a8c374665d94
+# ╟─7de08fb5-1f60-4917-be75-7adaf3db3cb6
+# ╠═69b935c0-f371-4994-a6b8-7e454418ca1c
+# ╠═0aabf55e-c701-437b-a743-7fb97312e8f4
+# ╠═4b10b793-f312-4210-90ee-e86a656647cd
+# ╠═cf85be5a-f5ef-4886-9985-5bea89b904d2
+# ╟─20bc047d-7d5f-4107-b56a-cda29443652f
+# ╠═39534d5b-a9df-4aa9-a0cd-9d373144c134
+# ╟─2da9c498-df17-4dc4-9c36-d6d4c836918f
+# ╟─b7e64b53-7f90-4dda-9351-dc3c632dfa70
+# ╟─229b00dc-9a22-43bc-8062-cf973c322bc3
+# ╠═667397b4-dd50-4e61-925c-a3d82c31c2e2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
